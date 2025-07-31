@@ -11,13 +11,11 @@ class JWTCallbackHandler(BaseCallbackHandler):
             )
 
         user = self.get_or_create_user(user_info, tokens, provider)
-
         refresh = RefreshToken.for_user(user)
 
         return {
             "success": True,
             "provider": provider,
-            "user": user,
             "tokens": {
                 "access_token": str(refresh.access_token),
                 "refresh_token": str(refresh),

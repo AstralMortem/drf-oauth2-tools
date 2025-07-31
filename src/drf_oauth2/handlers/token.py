@@ -8,4 +8,4 @@ class TokenCallbackHandler(BaseCallbackHandler):
         user = self.get_or_create_user(user_info, tokens, provider)
         token, created = Token.objects.get_or_create(user=user)
 
-        return {"success": True, "provider": provider, "token": token.key, "user": user}
+        return {"success": True, "provider": provider, "token": token.key}

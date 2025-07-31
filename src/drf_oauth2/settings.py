@@ -77,9 +77,6 @@ FACEBOOK_DEFAULTS = {
 DEFAULTS = {
     "REQUIRED_USER_FIELDS": ["email", "username"],
     "CALLBACK_HANDLER_CLASS": "drf_oauth2.handlers.jwt.JWTCallbackHandler",
-    "JWT_TOKEN_RESPONSE_SERIALIZER": "drf_oauth2.serializers.JWTTokenResponseSerializer",
-    "USER_INFO_RESPONSE_SERIALIZER": "drf_oauth2.serializers.UserInfoSerializer",
-    "USER_IN_CALLBACK_RESPONSE": True,
     "GOOGLE": GOOGLE_DEFAULTS,
     "GITHUB": GITHUB_DEFAULTS,
     "FACEBOOK": FACEBOOK_DEFAULTS,
@@ -87,8 +84,6 @@ DEFAULTS = {
 
 IMPORT_STRINGS = (
     "CALLBACK_HANDLER_CLASS",
-    "JWT_TOKEN_RESPONSE_SERIALIZER",
-    "USER_INFO_RESPONSE_SERIALIZER",
 )
 
 

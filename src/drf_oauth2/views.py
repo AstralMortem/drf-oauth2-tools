@@ -8,6 +8,12 @@ import secrets
 from django.shortcuts import redirect
 from drf_oauth2.providers.base import BaseOAuthProvider
 
+# Add suport for drf_spectacular
+try:
+    from drf_spectacular.utils import extend_schema
+except ImportError:
+    extend_schema = lambda **kwargs: lambda x: x
+
 
 class OAuthViewSet(GenericViewSet):
     def get_queryset(self):
@@ -29,6 +35,7 @@ class OAuthViewSet(GenericViewSet):
 
         return provider_class(provider_config)
 
+    @extend_schema(responses=serializers.OAuthLoginResponseSerializer())
     @action(
         detail=False,
         methods=["get", "post"],
@@ -65,7 +72,8 @@ class OAuthViewSet(GenericViewSet):
             return Response(response_serializer.data)
         except Exception as e:
             raise e
-
+    
+    @extend_schema(responses=serializers.OAuthCallbackResponseSerializer())
     @action(
         detail=False,
         methods=["get", "post"],

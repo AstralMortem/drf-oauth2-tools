@@ -10,4 +10,4 @@ class SessionCallbackHandler(BaseCallbackHandler):
         if request:
             login(request, user)
 
-        return {"success": True, "provider": provider, "user": user}
+        return {"success": True, "provider": provider}
