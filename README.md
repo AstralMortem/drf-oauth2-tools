@@ -44,7 +44,7 @@ OAUTH_PROVIDERS = {
         'CLIENT_ID': 'your-google-client-id',
         'CLIENT_SECRET': 'your-google-client-secret',
     },
-    'github': {
+    'GITHUB': {
         'CLIENT_ID': 'your-github-client-id',
         'CLIENT_SECRET': 'your-github-client-secret',
     },
@@ -148,7 +148,7 @@ OAUTH_PROVIDERS = {
 
 ## 🔐 Supported Authentication Types
 
-- **JWT Tokens** (via `djangorestframework-simplejwt`)
+- **JWT Tokens** (via `djangorestframework-simplejwt`) (DEFAULT)
 - **Django Sessions** 
 - **DRF Tokens**
 - **Custom handlers**
