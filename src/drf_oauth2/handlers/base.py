@@ -3,6 +3,8 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Dict
 from drf_oauth2.models import SocialAccount
 from django.contrib.auth import get_user_model
+from drf_oauth2.settings import oauth_settings
+from rest_framework.exceptions import AuthenticationFailed
 
 User = get_user_model()
 
@@ -46,11 +48,12 @@ class BaseCallbackHandler(ABC):
                 pass
 
         if not user:
-            # TODO: add settings switch to allow user creation
-            user_data = self.extract_user_data(user_info)
-            user = User.objects.create_user(**user_data)
-
-        self.create_social_account(user, user_info, tokens, provider)
+            if oauth_settings.ALLOW_USER_CREATION:
+                user_data = self.extract_user_data(user_info)
+                user = User.objects.create_user(**user_data)
+                self.create_social_account(user, user_info, tokens, provider)
+            else:
+                raise AuthenticationFailed("User does not exist")
 
         return user
 
@@ -100,16 +103,9 @@ class BaseCallbackHandler(ABC):
 
     def extract_user_data(self, user_info: Dict[str, Any]) -> Dict[str, Any]:
         """Extract user data for user creation"""
-        email = user_info.get("email", "")
-        username = user_info.get("username") or email or f"user_{user_info.get('id')}"
-
-        # Ensure username is unique
-        if User.objects.filter(username=username).exists():
-            username = f"{username}_{user_info.get('id')}"
-
-        return {
-            "email": email,
-            "username": username,
-            "first_name": user_info.get("first_name", ""),
-            "last_name": user_info.get("last_name", ""),
-        }
+        payload = {}
+        for field in oauth_settings.REQUIRED_USER_FIELDS:
+            payload[field] = user_info.get(field, "")
+        if "username" in payload and username == '':
+            username =  user_info.get("email", "") or f"user_{user_info.get('provider_id')}"
+        return payload

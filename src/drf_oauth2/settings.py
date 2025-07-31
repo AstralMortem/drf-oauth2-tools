@@ -76,6 +76,7 @@ FACEBOOK_DEFAULTS = {
 
 DEFAULTS = {
     "REQUIRED_USER_FIELDS": ["email", "username"],
+    "ALLOW_USER_CREATION": True,
     "CALLBACK_HANDLER_CLASS": "drf_oauth2.handlers.jwt.JWTCallbackHandler",
     "GOOGLE": GOOGLE_DEFAULTS,
     "GITHUB": GITHUB_DEFAULTS,
