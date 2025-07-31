@@ -1,83 +1,171 @@
+# README.md
+
+# DRF Social OAuth
 
 
-## 🚀 Major Features
+A highly extensible Django REST Framework library for OAuth social login with customizable providers and handlers.
 
-### **1. ViewSet-Based Architecture**
-- **`OAuthViewSet`**: Centralized viewset handling all OAuth operations
-- **Dynamic provider handling**: Single viewset manages all providers
-- **RESTful endpoints**: Clean API design with proper HTTP methods
+## ✨ Features
 
-### **2. Flexible Configuration System**
-- **New settings format**: Centralized `OAUTH_PROVIDERS` configuration
-- **Per-provider customization**: Different handlers per provider
-- **Backward compatibility**: Still supports legacy settings format
-- **Dynamic redirect URIs**: Automatically generated from request
+- 🔐 **Multiple OAuth Providers**: Google, Facebook, GitHub, Twitter out of the box
+- 🎛️ **Highly Customizable**: Custom providers, handlers, and response formats  
+- 🏗️ **DRF Native**: Built with ViewSets, Serializers, and proper REST patterns
+- 🔑 **Multiple Auth Types**: JWT, Sessions, DRF Tokens supported
+- 🛡️ **Security First**: CSRF protection, proper error handling, secure defaults
+- 📊 **Admin Integration**: Django admin interface for social accounts
+- 🧪 **Well Tested**: Comprehensive test suite with high coverage
+- 📚 **Great Documentation**: Detailed docs with examples
 
-### **3. Comprehensive Serializers**
-- **Input validation**: Proper request validation with detailed error messages
-- **Response formatting**: Consistent response structure
-- **Documentation ready**: Built-in help_text for API documentation
+## 🚀 Quick Start
 
-### **4. Enhanced Provider System**
-- **Normalized user data**: Standardized user info across providers
-- **Extensible base class**: Easy to add new providers
-- **Provider registry**: Dynamic provider registration
-- **Custom parameters**: Provider-specific OAuth parameters
+### Installation
 
-### **5. Advanced Handler System**
-- **Multiple handlers**: JWT, Session, Token handlers included
-- **Per-provider handlers**: Different logic per provider
-- **User management**: Automatic user creation and account linking
-- **Token management**: OAuth token storage and refresh
-
-## 🛠 Key API Endpoints
-
-```
-GET  /api/auth/oauth/login/{provider}/    # Initiate OAuth login  
-POST /api/auth/oauth/login/{provider}/    # Initiate with POST data
-GET  /api/auth/oauth/callback/{provider}/ # Handle OAuth callback
-POST /api/auth/oauth/callback/{provider}/ # Handle callback with POST
+```bash
+pip install drf-oauth2-tools
 ```
 
-## ⚙️ Configuration Examples
+### Basic Setup
 
-### Modern Configuration:
+1. Add to your `INSTALLED_APPS`:
+
+```python
+INSTALLED_APPS = [
+    # ... other apps
+    'rest_framework',
+    'drf_oauth2',
+]
+```
+
+2. Configure OAuth providers in `settings.py`:
+
 ```python
 OAUTH_PROVIDERS = {
     'GOOGLE': {
-        'CLIENT_ID': 'your-client-id',
-        'CLIENT_SECRET': 'your-client-secret',
-        'SCOPE': ['openid', 'email', 'profile'],
-    }
+        'CLIENT_ID': 'your-google-client-id',
+        'CLIENT_SECRET': 'your-google-client-secret',
+    },
+    'github': {
+        'CLIENT_ID': 'your-github-client-id',
+        'CLIENT_SECRET': 'your-github-client-secret',
+    },
 }
 ```
 
-### Custom Provider:
+3. Add URLs to your `urls.py`:
+
 ```python
-class CustomProvider(BaseOAuthProvider):
-    PROVIDER = "twitter"
-    
-    # Implement abstract methods...
-    
+from django.urls import path, include
+
+urlpatterns = [
+    path('api/auth/', include('drf_oauth2.urls')),
+]
 ```
 
-### Custom Handler:
+4. Run migrations:
+
+```bash
+python manage.py migrate
+```
+
+## 🎯 Usage
+
+### API Endpoints
+
+```bash           # List available providers
+GET  /api/auth/oauth/login/google/        # Initiate Google OAuth
+GET  /api/auth/oauth/callback/google/     # Handle OAuth callback
+```
+
+### Frontend Integration
+
+```javascript
+// Get authorization URL
+const response = await fetch('/api/auth/oauth/login/google/');
+const data = await response.json();
+
+// Redirect user to OAuth provider
+window.location.href = data.authorization_url;
+
+// After callback, you'll receive JWT tokens
+```
+
+
+## 🔧 Advanced Configuration
+
+### Custom Callback Handler
+
 ```python
+from drf_oauth2.handlers import BaseCallbackHandler
+
 class CustomHandler(BaseCallbackHandler):
     def handle_callback(self, user_info, tokens, provider, request=None):
         user = self.get_or_create_user(user_info, provider)
-        return {'custom': 'response', 'user_id': user.id}
+        return {
+            'success': True,
+            'user_id': user.id,
+            'custom_data': 'your custom response'
+        }
+
+# Configure in settings
+OAUTH_PROVIDERS = {
+    'GOOGLE': {
+        'CLIENT_ID': 'your-client-id',
+        'CLIENT_SECRET': 'your-client-secret',   
+    },
+    "CALLBACK_HANDLER_CLASS": 'myapp.handlers.CustomHandler',
+}
 ```
 
-## 🎯 Key Benefits
+### Custom OAuth Provider
 
-✅ **Highly Extensible**: Easy to add providers and customize behavior  
-✅ **Production Ready**: Proper error handling, logging, security  
-✅ **DRF Native**: Uses ViewSets, Serializers, proper REST patterns  
-✅ **Multiple Auth Types**: JWT, Sessions, DRF Tokens supported  
-✅ **Admin Integration**: Django admin for social accounts  
-✅ **Management Commands**: CLI tools for configuration checking  
-✅ **Type Hints**: Full type annotations for better IDE support  
-✅ **Documentation**: Comprehensive examples and docstrings  
+```python
+from drf_oauth2.providers import BaseOAuthProvider, register_provider
 
-The library now supports dynamic provider configuration, making it extremely flexible for different use cases while maintaining backward compatibility and following Django/DRF best practices.
+class LinkedInProvider(BaseOAuthProvider):
+    PROVIDER = "linkedin"
+    AUTHORIZATION_URL = "https://www.linkedin.com/oauth/v2/authorization"
+    
+    # ... implement other required methods
+
+# Configure in settings
+OAUTH_PROVIDERS = {
+    'LINKEDIN': {
+        'CLIENT_ID': 'your-client-id',
+        'CLIENT_SECRET': 'your-client-secret',
+        "PROVIDER_CLASS": "myapp.providers.linkedin.LinkedInProvider'
+    },
+}
+
+```
+
+## 📋 Supported Providers
+
+- **Google** - `google`
+- **Facebook** - `facebook` 
+- **GitHub** - `github`
+- **Twitter** - `twitter`
+- **Custom providers** - Easy to add
+
+## 🔐 Supported Authentication Types
+
+- **JWT Tokens** (via `djangorestframework-simplejwt`)
+- **Django Sessions** 
+- **DRF Tokens**
+- **Custom handlers**
+
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Django REST Framework team
+- OAuth provider documentation
+- Contributors and users
+
+---
+
+
+Made with ❤️ by [AstralMortem](https://github.com/AstralMortem)
+
