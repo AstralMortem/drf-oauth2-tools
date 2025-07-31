@@ -1,6 +1,6 @@
 [project]
 name = "drf-oauth2-tools"
-version = "1.0.0"
+version = "1.0.1"
 description = "Comprehensive Django REST Framework library for OAuth social login"
 authors = [
     {name = "Vladyslav Chaliuk",email = "chaliukvladyslav@gmail.com"}
